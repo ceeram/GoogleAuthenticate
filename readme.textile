@@ -2,6 +2,8 @@ h1. GoogleAuthenticate plugin
 
 Plugin containing Google 2 step authenticate class for AuthComponent.
 
+Includes libs from https://github.com/chregu/GoogleAuthenticator.php with some minor adjustments
+
 h2. Requirements
 
 * PHP 5.3
@@ -76,7 +78,67 @@ Example for GoogleAuthenticate:
     );
 </code></pre>
 
-h2. License
+h2. Usage
+
+Above configuration is what is needed to be able to login using the adapter.
+You need to generate a secret code and store it in your users table.
+
+You can show the secret code to the user, or display a QRcode.
+
+Here is an example action in UsersController which handles all this:
+
+<pre><code>
+/**
+ * Displays secret code and QRcode for the user account.
+ * Will create a secret, if not set in users table
+ *
+ * Also handles removal of secret from database with Form->postLink(), to allow normal login again.
+ *
+ * To generate a different secret, browse to http://domain.com/users/secret/renew
+ *
+ * @return void
+ */
+	public function secret($renew = null) {
+		$this->User->id = $this->Auth->user('id');
+		if ($this->request->is('post')) {
+			$this->User->saveField('secret', null);
+			$this->redirect(array('action' => 'view', $this->User->id));
+		}
+
+		App::uses('GoogleAuthenticator', 'GoogleAuthenticate.Lib');
+		$Google = new GoogleAuthenticator();
+
+		$secret = $this->User->field('secret');
+		if (!$secret || $renew == 'renew') {
+			$secret = $Google->generateSecret();
+			$this->User->saveField('secret', $secret);
+		}
+
+		$url = $Google->getUrl($secret, $this->Auth->user('username'), 'example.com');
+
+		$this->set(compact('secret', 'url'));
+	}
+
+</code></pre>
+
+And the secret.ctp view template for this action would be:
+
+<pre><code>
+<div class="users secret">
+	<h2><?php echo __('Google secret'); ?></h2>
+	<div>Enter this code manually: <?php echo $secret;?></div>
+	<div>Or scan the QRcode: <?php echo $this->Html->image($url);?></div>
+</div>
+<div class="actions">
+	<h3><?php echo __('Actions'); ?></h3>
+	<ul>
+		<li><?php echo $this->Html->link('Generate different secret', array('action' => 'secret', 'renew'));?></li>
+		<li><?php echo $this->Form->postLink('Remove secret');?></li>
+	</ul>
+</div>
+</code></pre>
+
+h2. License (unless otherwise stated in the files)
 
 Copyright (c) 2012 Ceeram
 
@@ -97,3 +159,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+h2. Other licenses:
+
+Lib/GoogleAuthenticator.php
+Apache License, Version 2.0
