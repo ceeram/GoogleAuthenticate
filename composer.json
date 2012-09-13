@@ -1,5 +1,5 @@
 {
-	"name": "ceeram/GoogleAuthenticate",
+	"name": "ceeram/google-authenticate",
 	"type": "cakephp-plugin",
         "description": "CakePHP plugin with Google 2 step authentication class for AuthComponent.",
 	"homepage": "http://github.com/ceeram/GoogleAuthenticate",
