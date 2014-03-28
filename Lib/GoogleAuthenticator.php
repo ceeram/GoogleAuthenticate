@@ -60,12 +60,16 @@ class GoogleAuthenticator {
 		return $val2[1];
 	}
 
-	public function getUrl($secret, $username, $hostname = null) {
-		if ($hostname) {
-			$username .= "@" . $hostname;
-		}
-		$data = "otpauth://totp/{$username}?secret={$secret}";
-		return "https://chart.googleapis.​com/chart?chs=200x200&chld=M|0&cht=qr&chl={$data}";
+	public function getUrl($secret, $username, $hostname = null, $issuer = null) {
+	        if ($hostname) {
+	            $username .= "@" . $hostname;
+	        }
+	        if (is_null($issuer)) {
+	            $data = "otpauth://totp/{$username}?secret={$secret}";
+	        } else {
+	            $data = "otpauth://totp/" . rawurlencode($issuer) . ":{$username}?secret={$secret}" . rawurlencode('&') . "issuer=" . rawurlencode($issuer);
+	        }
+	        return "https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=" . htmlentities($data);
 	}
 
 	public function generateSecret() {
