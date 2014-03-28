@@ -114,7 +114,7 @@ Here is an example action in UsersController which handles all this:
 			$this->User->saveField('secret', $secret);
 		}
 
-		$url = $Google->getUrl($secret, $this->Auth->user('username'), 'example.com');
+		$url = $Google->getUrl($secret, $this->Auth->user('username'), 'example.com', 'Example');
 
 		$this->set(compact('secret', 'url'));
 	}
