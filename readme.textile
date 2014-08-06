@@ -138,6 +138,20 @@ And the secret.ctp view template for this action would be:
 </div>
 </code></pre>
 
+And in your login form
+
+<pre><code>
+<?php 
+echo $this->Form->create('User');
+echo $this->Form->input('username');
+echo $this->Form->input('password');
+echo $this->Form->input('User.code');
+echo $this->Form->submit('Enter');
+echo $this->Form->end(); ?>
+</div>
+</code></pre>
+
+
 h2. License (unless otherwise stated in the files)
 
 Copyright (c) 2012 Ceeram
