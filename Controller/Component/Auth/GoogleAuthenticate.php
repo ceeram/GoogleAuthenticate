@@ -15,7 +15,8 @@ App::uses('GoogleAuthenticator', 'GoogleAuthenticate.Lib');
  *				'secret' => 'secret'//fieldname in table
  *	 		),
  *			'userModel' => 'User',
- *			'scope' => array('User.active' => 1)
+ *			'scope' => array('User.active' => 1),
+ * 			'passwordHasher' => 'Simple'
  *		)
  *	)
  * }}}
@@ -44,7 +45,8 @@ class GoogleAuthenticate extends BaseAuthenticate {
 		'userModel' => 'User',
 		'scope' => array(),
 		'recursive' => 0,
-		'contain' => null
+		'contain' => null,
+		'passwordHasher' => 'Simple'
 	);
 
 
