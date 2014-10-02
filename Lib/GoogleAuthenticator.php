@@ -25,14 +25,30 @@ class GoogleAuthenticator {
 		self::$PIN_MODULO = pow(10, self::$PASS_CODE_LENGTH);
 	}
 
-	public function checkCode($secret, $code) {
-		$time = floor(time() / 30);
-		for ($i = -1; $i <= 1; $i++) {
-			if ($this->getCode($secret, $time + $i) == $code) {
-				return true;
-			}
-		}
-		return false;
+	public function checkCode($secret, $code, $type) {
+                switch ($type) {
+                    case 'google':
+                        $time = floor(time() / 30);
+                        for ($i = -1; $i <= 1; $i++) {
+                                if ($this->getCode($secret, $time + $i) == $code) {
+                                        return true;
+                                }
+                        }
+                        return false;
+                        break;
+                    case 'feitian': 
+                        $time = floor(time() / 60);
+                        for ($i = -1; $i <= 1; $i++) {
+                                if ($this->getCodeFeitian($secret, $time + $i) == $code) {
+                                        return true;
+                                }
+                        }
+                        return false;
+                        break;
+                    default:
+                        return false;
+                        break;
+                }
 	}
 
 	public function getCode($secret, $time = null) {
@@ -46,6 +62,23 @@ class GoogleAuthenticator {
 		$time = str_pad($time, 8, chr(0), STR_PAD_LEFT);
 
 		$hash = hash_hmac('sha1', $time, $secret, true);
+		$offset = ord(substr($hash, -1));
+		$offset = $offset & 0xF;
+
+		$truncatedHash = self::hashToInt($hash, $offset) & 0x7FFFFFFF;
+		$pinValue = str_pad($truncatedHash % self::$PIN_MODULO, 6, "0", STR_PAD_LEFT);
+		return $pinValue;
+	}
+        
+        public function getCodeFeitian($secret, $time = null) {
+		if (!$time) {
+			$time = floor(time() / 60);
+		}
+		
+		$time = pack("N", $time);
+		$time = str_pad($time, 8, chr(0), STR_PAD_LEFT);
+
+		$hash = hash_hmac('sha1', $time, hex2bin($secret), true);
 		$offset = ord(substr($hash, -1));
 		$offset = $offset & 0xF;
 
