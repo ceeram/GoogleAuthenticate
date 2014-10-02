@@ -39,7 +39,8 @@ class GoogleAuthenticate extends BaseAuthenticate {
 			'username' => 'username',
 			'password' => 'password',
 			'code' => 'code',
-			'secret' => 'secret'
+			'secret' => 'secret',
+                        'type' => 'tokentype'
 		),
 		'userModel' => 'User',
 		'scope' => array(),
@@ -100,7 +101,7 @@ class GoogleAuthenticate extends BaseAuthenticate {
 
 		$Google = new GoogleAuthenticator();
 
-		return $Google->checkCode($user[$fields['secret']], $request->data[$model][$fields['code']]) ? $user : false;
+		return $Google->checkCode($user[$fields['secret']], $request->data[$model][$fields['code']], $user[$fields['type']]) ? $user : false;
 	}
 
 }
